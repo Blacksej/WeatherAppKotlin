@@ -15,20 +15,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import dev.danieltm.weatherapp.ui.theme.WeatherAppTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
 
     private val service = PostsService.create()
+    private var response = WeatherModelResponse.Welcome()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
-            val posts = produceState<WeatherModelResponse.Welcome>(
-                initialValue = WeatherModelResponse.Welcome(),
-                producer = {
-                    value = service.getPosts()
-                }
-            )
+
+            //Get the current weather in Odense
+            getWeather()
 
             WeatherAppTheme {
                 // A surface container using the 'background' color from the theme
@@ -41,15 +44,20 @@ class MainActivity : ComponentActivity() {
                                     .fillMaxWidth()
                                     .padding(16.dp)
                             ) {
-                                Text(text = posts.value.name, fontSize = 20.sp)
+                                Text(text = response.name, fontSize = 20.sp)
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text(text = posts.value.main?.temp.toString(), fontSize = 20.sp)
+                                Text(text = response.main?.feelsLike.toString(), fontSize = 20.sp)
                             }
                     }
                 }
             }
         }
+    fun getWeather(){
+        runBlocking {
+            launch { response = service.getPosts() }
+        }
     }
+}
 
 @Composable
 fun Greeting(name: String) {
