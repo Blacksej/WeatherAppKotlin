@@ -48,16 +48,27 @@ class MainActivity : ComponentActivity() {
                             Column(
                                 modifier = Modifier
                                     .padding(16.dp)
-                                    .offset(0.dp, 200.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
+                                    .offset(0.dp, 60.dp),
+                                horizontalAlignment = Alignment.Start
                             ) {
-                                Text(text = response.name.uppercase(), fontSize = 40.sp)
+                                Text(text = response.name.uppercase(), fontSize = 20.sp)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(text = "${(response.main?.temp?.minus(273.15)?.roundToInt()).toString()} \u2103", fontSize = 40.sp)
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text(text = "${(response.wind?.speed).toString()} m/s", fontSize = 30.sp)
+                                Text(text = "Feels like ${(response.main?.feelsLike?.minus(273.15)?.roundToInt()).toString()} \u2103", fontSize = 20.sp)
+                                Spacer(modifier = Modifier.height(20.dp))
+                                Text(text = response.weather[0].description, fontSize = 20.sp)
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .offset(0.dp, 70.dp),
+                                horizontalAlignment = Alignment.End
+                            ) {
+                                Text(text = "${(response.wind?.speed).toString()} m/s", fontSize = 20.sp)
                                 Spacer(modifier = Modifier.height(4.dp))
-                                Text(text = response.weather[0].description, fontSize = 30.sp)
+                                Text(text = "${(response.wind?.deg).toString()} deg", fontSize = 20.sp)
+
                             }
                     }
             }
