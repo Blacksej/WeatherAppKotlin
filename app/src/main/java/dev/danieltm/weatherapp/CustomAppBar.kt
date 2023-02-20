@@ -17,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.ktor.util.*
 
 @Composable
 fun CustomAppBar(city: String){
@@ -27,7 +29,7 @@ fun CustomAppBar(city: String){
         .fillMaxWidth()
     ){
         TopAppBar(
-            backgroundColor = Color.Blue,
+            backgroundColor = colorResource(R.color.status_bar_app_bar),
             elevation = 0.dp,
             title = {
                 Text(text = city, color = Color.White, fontSize = 20.sp)

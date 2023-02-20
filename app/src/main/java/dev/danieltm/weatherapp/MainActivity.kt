@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +26,9 @@ import dev.danieltm.weatherapp.ui.theme.WeatherAppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
@@ -35,44 +39,62 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            //Get the current weather in Odense
-            getWeather()
+            WeatherAppTheme {
+                //Get the current weather in Odense
+                getWeather()
 
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color.Cyan
+                    color = MaterialTheme.colors.background
 
                 ) {
                     ScaffoldTopBar(city = response.name.uppercase())
-                            Column(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .offset(0.dp, 60.dp),
-                                horizontalAlignment = Alignment.Start
-                            ) {
-                                Text(text = response.name.uppercase(), fontSize = 20.sp)
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(text = "${(response.main?.temp?.minus(273.15)?.roundToInt()).toString()} \u2103", fontSize = 40.sp)
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(text = "Feels like ${(response.main?.feelsLike?.minus(273.15)?.roundToInt()).toString()} \u2103", fontSize = 20.sp)
-                                Spacer(modifier = Modifier.height(20.dp))
-                                Text(text = response.weather[0].description, fontSize = 20.sp)
-                            }
-                            Column(
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .offset(0.dp, 70.dp),
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                Text(text = "${(response.wind?.speed).toString()} m/s", fontSize = 20.sp)
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(text = "${(response.wind?.deg).toString()} deg", fontSize = 20.sp)
-
-                            }
+                    Column(
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .offset(0.dp, 60.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        val hourOfDay = remember {
+                            LocalTime.now()
+                                .hour + 1
+                        }
+                        val dayOfWeek = remember {
+                            LocalDate.now()
+                                .dayOfWeek
+                        }
+                        Text(text = "$dayOfWeek $hourOfDay:00", fontSize = 20.sp)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "${
+                                (response.main?.temp?.minus(273.15)?.roundToInt()).toString()
+                            } \u2103", fontSize = 40.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Feels like ${
+                                (response.main?.feelsLike?.minus(273.15)?.roundToInt()).toString()
+                            } \u2103", fontSize = 20.sp
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Text(text = response.weather[0].description, fontSize = 20.sp)
                     }
+                    Column(
+                        modifier = Modifier
+                            .padding(20.dp)
+                            .offset(0.dp, 70.dp),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Text(text = "${(response.wind?.speed).toString()} m/s", fontSize = 20.sp)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(text = "${(response.wind?.deg).toString()} deg", fontSize = 20.sp)
+
+                    }
+                }
             }
         }
+    }
     fun getWeather(){
         runBlocking {
             launch { response = service.getPosts() }
