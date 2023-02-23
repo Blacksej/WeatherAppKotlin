@@ -74,4 +74,8 @@ dependencies {
     implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
 
+
+    // Location Dependencies
+    implementation 'com.google.android.gms:play-services-location:19.0.1'
+
 }
