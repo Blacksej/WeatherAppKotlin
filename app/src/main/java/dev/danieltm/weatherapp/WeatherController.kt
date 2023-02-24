@@ -9,9 +9,9 @@ class WeatherController(
     // Dependency injection
     private val client: HttpClient
 ) : PostsService{
-     override suspend fun getPosts(): WeatherModelResponse.Welcome {
+     override suspend fun getPosts(lat: String, long: String): WeatherModelResponse.Welcome {
         return try{
-           client.get { url(HttpRoutes.GET_ODENSE) }.body()
+           client.get { url(HttpRoutes.getWeatherFromLatAndLong(lat, long)) }.body()
 
         } catch (e: RedirectResponseException){
             // 3xx - responses

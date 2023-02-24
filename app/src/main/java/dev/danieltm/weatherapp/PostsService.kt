@@ -8,7 +8,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
 interface PostsService {
-    suspend fun getPosts(): WeatherModelResponse.Welcome
+    suspend fun getPosts(lat: String, long: String): WeatherModelResponse.Welcome
 
     companion object{
         fun create() : PostsService{

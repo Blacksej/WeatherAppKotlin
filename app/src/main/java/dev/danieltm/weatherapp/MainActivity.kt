@@ -16,10 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,7 +45,10 @@ class MainActivity : ComponentActivity() {
     private var response = WeatherModelResponse.Welcome()
     private var locationProvider = LocationProvider()
 
-    private var longAndLats: ArrayList<String> = ArrayList()
+    private var longitude = mutableStateOf("0")
+    private var latitude = mutableStateOf("0")
+    private var cityName = mutableStateOf("0")
+    private var weatherDescription = mutableStateOf("0")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,16 +59,13 @@ class MainActivity : ComponentActivity() {
                 // Gets the current long and latitude
                 getLocation()
 
-                //Get the current weather in Odense
-                getWeather()
-
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
 
                 ) {
-                    ScaffoldTopBar(city = response.name.uppercase())
+                    ScaffoldTopBar(city = cityName.value.uppercase())
                     Column(
                         modifier = Modifier
                             .padding(20.dp)
@@ -89,16 +86,16 @@ class MainActivity : ComponentActivity() {
                         Text(
                             text = "${
                                 (response.main?.temp?.minus(273.15)?.roundToInt()).toString()
-                            } \u2103", fontSize = 40.sp
+                            }\u00B0", fontSize = 40.sp
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Feels like ${
                                 (response.main?.feelsLike?.minus(273.15)?.roundToInt()).toString()
-                            } \u2103", fontSize = 20.sp
+                            }\u00B0", fontSize = 20.sp
                         )
                         Spacer(modifier = Modifier.height(20.dp))
-                        //Text(text = response.weather[0].description, fontSize = 20.sp)
+                        Text(text = weatherDescription.value, fontSize = 20.sp)
                     }
                     Column(
                         modifier = Modifier
@@ -109,34 +106,34 @@ class MainActivity : ComponentActivity() {
                         Text(text = "${(response.wind?.speed).toString()} m/s", fontSize = 20.sp)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(text = "${(response.wind?.deg).toString()} deg", fontSize = 20.sp)
-
-                        Spacer(modifier = Modifier.height(4.dp))
-                        //Text(text = "Latitude: ${longAndLats[0]}", fontSize = 20.sp)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        //Text(text = "Longitude: ${longAndLats[1]}", fontSize = 20.sp)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Button(onClick = {
-                            getLocation()
-                        }) {
-                            Text(text = "Get Location")
-                        }
-
                     }
                 }
             }
         }
     }
 
-    private fun getWeather(){
+    private fun getWeather(lat: String, long: String){
         runBlocking {
-            launch { response = service.getPosts() }
+            launch {
+                response = service.getPosts(lat, long)
+                weatherDescription.value = response.weather[0].description
+            }
         }
     }
 
     private fun getLocation(){
-        runBlocking {
-            launch { longAndLats = locationProvider.getLocation(this@MainActivity, context) }
-        }
+        locationProvider.getLocation(this@MainActivity, context)
+        // Callback function here
+        {list: ArrayList<String> ->
+            latitude.value = list[0]
+            longitude.value = list[1]
+            getCity(list[0], list[1])
+            getWeather(list[0], list[1])}
+    }
+
+    // Method for setting the cityname variable
+    private fun getCity(lat: String, long: String){
+        cityName.value = locationProvider.getCityName(lat.toDouble(), long.toDouble(), context)
     }
 }
 
